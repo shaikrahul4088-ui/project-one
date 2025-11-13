@@ -1,0 +1,145 @@
+Here’s a step-by-step tutorial on how to write a YAML manifest for Kubernetes, in English + Telugu side-by-side, with a simple example and key fields.
+
+1. What is YAML & why use it?
+
+English: YAML (“YAML Ain’t Markup Language”) is a human-readable format used by Kubernetes to define the desired state of resources (Deployments, Services, etc.). With YAML you describe what you want, and Kubernetes ensures the actual state matches. 
+Spacelift
++2
+Kubernetes
++2
+
+Telugu (తెలుగు): YAML అనేది మనుషులకి చదవడానికై సులభంగా ఉండే ఫార్మాట్. కుబెర్నెటీస్‌లో రిసోర్స్లు (Deployment, Service లాంటివి) కు మనం “దవ-వలసిన స్థితి”ని YAML ద్వారా వివరించాలి. Kubernetes ఆ వివరాలను “వాస్తవంగా ఉన్న స్థితి”తో సరిపోదంటుంది.
+
+2. Basic structure of a Kubernetes YAML manifest
+
+Here are the common sections you’ll see:
+
+Field	Description	తెలుగు వివరణ
+apiVersion	The API version of the resource type (e.g., apps/v1). 
+Octopus Deploy
++1
+	ఈ రిసోర్సు ఏ API గ్రూప్ ను ఉపయోగిస్తుంది అనేది.
+kind	What type of resource (e.g., Deployment, Service). 
+Kubernetes
++1
+	ఈ YAML ద్వారా ఏ రకమైన రిసోర్సు సృష్టించబోతున్నామో.
+metadata	Metadata like name, labels. 
+Spacelift
+	ఆటోమేటిక్ అయిపోయే పేరు, లేబుల్స్ వంటివి.
+spec	Specification of the desired state (replicas, template, containers, etc.). 
+Octopus Deploy
++1
+	మనం కోరిన స్థితిని విపులంగా డిఫైన్ చేసే భాగం.
+3. Example YAML with explanation
+
+English: Here’s a complete example (Deployment) with comments so you can follow.
+Telugu (తెలుగు): క్రింద ఒక ఉదాహరణ YAML ఉంది. వ్యాఖ్యలతో కలిసి ఉన్నది కాబట్టి అన్నింటిని సులభంగా అర్థం చేసుకోవచ్చు.
+
+apiVersion: apps/v1               # API version – apiVersion: apps/v1
+kind: Deployment                  # Resource type – Deployment
+metadata:
+  name: demo-deployment           # Deployment పేరు
+  labels:
+    app: demo                      # లేబుల్
+spec:
+  replicas: 2                      # రెండు నకలు (pods) రన్ అవ్వాలి
+  selector:
+    matchLabels:
+      app: demo                    # ఈ డిప్లాయ్‌మెంట్ ఏ నోడ్‌లను పంపించాలి అన్నది
+  template:
+    metadata:
+      labels:
+        app: demo                  # పాడ్స్ లోని లేబుల్
+    spec:
+      containers:
+        - name: demo-container      # కంటైనర్ పేరు
+          image: nginx:latest        # Docker ఇమేజ్
+          ports:
+            - containerPort: 80       # పోర్ట్
+          livenessProbe:              # లైవ్‌నెస్ ప్రోబ్ (జీవిత సూచిక)
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:             # రెడీనెస్ ప్రోబ్ (సర్వీస్ ఇవ్వడానికి సిద్ధంగా ఉన్నదా)
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+4. Key fields explained
+
+English / Telugu
+
+replicas: How many pod instances you want. / మీరు ఎన్నో పాడ్‌లు ఉండాలని కోరుకుంటున్నారో.
+
+selector + matchLabels: Helps Kubernetes know which pods are managed by this Deployment. / ఏ పాడ్‌లను ఈ డిప్లాయ్‌మెంట్ మేనేజ్ చేయాలో చెప్పేది.
+
+template: The pod spec template. / పాడ్ ఎలా ఉండాలి అన్న టెంప్లేట్.
+
+Under containers: image, ports etc. / కంటైనర్ ఇమేజ్, పోర్ట్ లాంటి వివరాలు.
+
+livenessProbe: Checks if the container is alive; if fails then container restarts. 
+Kubernetes
++2
+Theodo Cloud
++2
+ / లైవ్‌నెస్ ప్రోబ్ అంటే కంటైనర్ ఇంకా బదులిచ్చుతున్నదా అన్నదాన్ని చెక్ చేస్తుంది; ఫెయిలయితే రీస్టార్ట్.
+
+readinessProbe: Checks if the container is ready to receive traffic; if not ready, traffic is not sent. 
+Medium
++1
+ / రెడీనెస్ ప్రోబ్ అంటే ట్రాఫిక్ అందుకోడానికి తయారైందా అన్నది చెక్.
+
+You can also add startupProbe (especially if your app takes long time to start) so liveness/readiness wait until startup succeeds. 
+Kubernetes
+ / స్టార్టప్ ప్రోబ్ ఉంటే, యాప్ చాలా సమయం తీసుకుంటే కొన్నిసార్లు లైవ్/రెడీనెస్ చెక్ వేగంగా ఫెయిల్ అవ్వకుండా ఉండ Helps.
+
+5. Applying the YAML
+
+English:
+
+Save the above text to a file, e.g., deployment.yaml.
+
+Run:
+
+kubectl apply -f deployment.yaml
+
+
+To check status:
+
+kubectl get deployments
+kubectl get pods
+
+
+Telugu:
+
+పై YAML ని deployment.yaml అనే ఫైల్లో సేవ్ చేయండి.
+
+ఈ కమాండ్ రాస్తే:
+
+kubectl apply -f deployment.yaml
+
+
+స్టేటస్ తెలుసుకోవటానికి:
+
+kubectl get deployments
+kubectl get pods
+
+6. Common pitfalls & tips
+
+Ensure indentation is correct (YAML లో సపష్టం తప్పక).
+
+Labels in selector.matchLabels must match the labels in template.metadata.labels. లేకపోతే pods సృష్టించబడవు. 
+Kubernetes
+
+For probes, choose correct initialDelaySeconds, periodSeconds, etc. Application startup time vary. 
+Groundcover
++1
+
+If your app doesn’t expose HTTP endpoint, you can use tcpSocket, exec probes. 
+Medium
+
+If you like, I can create a full tutorial PDF (English + Telugu), with multiple YAML examples (Deployment with Service, StatefulSet, PVC) and diagrams for you. Would you like that?
